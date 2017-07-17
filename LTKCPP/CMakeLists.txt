@@ -9,5 +9,5 @@ set(TOP_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
 add_subdirectory(Library)
 add_subdirectory(Examples)
 add_subdirectory(Tests)
-add_subdirectory(Release)
+#add_subdirectory(Release)
 
