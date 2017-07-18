@@ -92,5 +92,6 @@ ltkcpp_connection.h
 ltkcpp_frame.h
 ltkcpp_platform.h
 ltkcpp_xmltext.h
+version.inc
 ${CMAKE_CURRENT_BINARY_DIR}/out_ltkcpp.h
 DESTINATION ${INSTALL_INCLUDEDIR})
