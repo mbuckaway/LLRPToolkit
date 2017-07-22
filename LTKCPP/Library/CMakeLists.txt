@@ -13,8 +13,19 @@ set(CODE_GEN_H_XSLT "${LTKCPP_SRC_PATH}/ltkcpp_gen_h.xslt")
 set(CODE_GEN_CPP_XSLT "${LTKCPP_SRC_PATH}/ltkcpp_gen_cpp.xslt")
 set(LLRPDEF "${DEFINITIONS_PATH}/Core/llrp-1x0-def.xml")
 
+# On Windows, we just assume the location. On Mac/Linux, we can figure it out
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+set(LIBXML2_INCLUDE_DIR "${XMLLIBDIR}/include/libxml2")
+set(LIBXML2_LIBRARIES "${XMLLIBDIR}/lib/libxml2.lib")
+set(LIBXSLT_INCLUDE_DIR "${XMLLIBDIR}/include/libxslt")
+set(LIBXSLT_LIBRARIES "${XMLLIBDIR}/lib/libxslt.lib")
+set(LIBXSLT_XSLTPROC_EXECUTABLE "${XMLLIBDIR}/bin/xsltproc.exe")
+set(LIBTYPE "STATIC")
+else()
 find_package(LIBXML2 REQUIRED)
 find_package(LIBXSLT REQUIRED)
+set(LIBTYPE "SHARED")
+endif()
 
 message ("CurrentBinDir: ${CMAKE_CURRENT_BINARY_DIR}")
 message ("Include: ${CMAKE_CURRENT_SOURCE_DIR}/${PATH_MODIFIER}")
@@ -29,7 +40,17 @@ link_directories(
 ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-add_library(ltklib SHARED
+# Textdecode has not been ported to windows yet
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+set(TEXTDECODE "")
+set(WINSOCK "Ws2_32.lib")
+else()
+set(TEXTDECODE "ltkcpp_xmltextdecode.cpp")
+set(WINSOCK "")
+endif()
+
+
+add_library(ltklib ${LIBTYPE}
 ltkcpp.h
 ltkcpp_base.h
 ltkcpp_connection.h
@@ -47,9 +68,10 @@ ltkcpp_frameextract.cpp
 ltkcpp_genout.cpp
 ltkcpp_hdrfd.cpp
 ltkcpp_typeregistry.cpp
-ltkcpp_xmltextdecode.cpp
 ltkcpp_xmltextencode.cpp
+${TEXTDECODE}
 )
+
 
 set_target_properties(ltklib PROPERTIES OUTPUT_NAME ltkcpp) 
 set_target_properties(ltklib PROPERTIES DEBUG_POSTFIX "d")
@@ -59,6 +81,7 @@ set_target_properties(ltklib PROPERTIES DEBUG_POSTFIX "d")
 target_link_libraries(ltklib
 	${LIBXML2_LIBRARIES}
 	${LIBXSLT_LIBRARIES}
+	${WINSOCK}
 )
 
 add_subdirectory(LLRP.org)
