@@ -7,8 +7,18 @@ project(Tests)
 message ("Tests LTKCPP_SRC_PATH = ${LTKCPP_SRC_PATH}")
 message ("Tests LTKCPP_LIB_PATH = ${LTKCPP_LIB_PATH}")
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+set(LIBXML2_INCLUDE_DIR "${XMLLIBDIR}/include/libxml2")
+set(LIBXML2_LIBRARIES "${XMLLIBDIR}/lib/libxml2.lib")
+set(LIBXSLT_INCLUDE_DIR "${XMLLIBDIR}/include/libxslt")
+set(LIBXSLT_LIBRARIES "${XMLLIBDIR}/lib/libxslt.lib")
+set(LIBXSLT_XSLTPROC_EXECUTABLE "${XMLLIBDIR}/bin/xsltproc.exe")
+set(WINSOCK "Ws2_32.lib")
+else()
 find_package(LIBXML2 REQUIRED)
 find_package(LIBXSLT REQUIRED)
+set(WINSOCK "")
+endif()
 
 include_directories(
 ${LIBXML2_INCLUDE_DIR}
@@ -17,6 +27,8 @@ ${LTKCPP_SRC_PATH}
 ${LTKCPP_LIB_PATH}
 )
 
+# Textdecode not supports on Windows, so we can't link this
+if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 add_executable(xml2llrp
 xml2llrp.cpp
 )
@@ -29,7 +41,9 @@ target_link_libraries(xml2llrp
 	${LIBXSLT_LIBRARIES}
 	$<TARGET_LINKER_FILE:ltklib>
 	$<TARGET_LINKER_FILE:llrplib>
+	${WINSOCK}
 )
+endif()
 
 add_executable(llrp2xml
 llrp2xml.cpp
@@ -43,6 +57,7 @@ target_link_libraries(llrp2xml
 	${LIBXSLT_LIBRARIES}
 	$<TARGET_LINKER_FILE:ltklib>
 	$<TARGET_LINKER_FILE:llrplib>
+	${WINSOCK}
 )
 
 add_executable(dx201
@@ -57,9 +72,17 @@ target_link_libraries(dx201
 	${LIBXSLT_LIBRARIES}
 	$<TARGET_LINKER_FILE:ltklib>
 	$<TARGET_LINKER_FILE:llrplib>
+	${WINSOCK}
 )
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+install(TARGETS dx201 llrp2xml
+        RUNTIME DESTINATION ${INSTALL_BINDIR}
+        LIBRARY DESTINATION ${INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${INSTALL_LIBDIR})
+else()
 install(TARGETS dx201 llrp2xml xml2llrp
         RUNTIME DESTINATION ${INSTALL_BINDIR}
         LIBRARY DESTINATION ${INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${INSTALL_LIBDIR})
+endif()

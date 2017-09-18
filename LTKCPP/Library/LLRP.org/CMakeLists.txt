@@ -12,8 +12,19 @@ set(OUTDIR "${OUTDIR}/${PROJECT_NAME}")
 message ("LTKCPP_SRC_PATH = ${LTKCPP_SRC_PATH}")
 message ("LTKCPP_LIB_PATH = ${LTKCPP_LIB_PATH}")
 
+# On Windows, we just assume the location. On Mac/Linux, we can figure it out
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+set(LIBXML2_INCLUDE_DIR "${XMLLIBDIR}/include/libxml2")
+set(LIBXML2_LIBRARIES "${XMLLIBDIR}/lib/libxml2.lib")
+set(LIBXSLT_INCLUDE_DIR "${XMLLIBDIR}/include/libxslt")
+set(LIBXSLT_LIBRARIES "${XMLLIBDIR}/lib/libxslt.lib")
+set(LIBXSLT_XSLTPROC_EXECUTABLE "${XMLLIBDIR}/bin/xsltproc.exe")
+set(LIBTYPE "STATIC")
+else()
 find_package(LIBXML2 REQUIRED)
 find_package(LIBXSLT REQUIRED)
+set(LIBTYPE "SHARED")
+endif()
 
 include_directories(
 ${LIBXML2_INCLUDE_DIR}
@@ -22,7 +33,7 @@ ${LTKCPP_SRC_PATH}
 ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-add_library(llrplib SHARED
+add_library(llrplib ${LIBTYPE}
 llrporg_ltkcpp.h
 llrporg_ltkcpp_genout.cpp
 )

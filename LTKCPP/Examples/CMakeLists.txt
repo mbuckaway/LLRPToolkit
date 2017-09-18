@@ -7,8 +7,19 @@ project(Examples)
 message ("Examples LTKCPP_SRC_PATH = ${LTKCPP_SRC_PATH}")
 message ("Examples LTKCPP_LIB_PATH = ${LTKCPP_LIB_PATH}")
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+set(LIBXML2_INCLUDE_DIR "${XMLLIBDIR}/include/libxml2")
+set(LIBXML2_LIBRARIES "${XMLLIBDIR}/lib/libxml2.lib")
+set(LIBXSLT_INCLUDE_DIR "${XMLLIBDIR}/include/libxslt")
+set(LIBXSLT_LIBRARIES "${XMLLIBDIR}/lib/libxslt.lib")
+set(LIBXSLT_XSLTPROC_EXECUTABLE "${XMLLIBDIR}/bin/xsltproc.exe")
+set(WINSOCK "Ws2_32.lib")
+else()
 find_package(LIBXML2 REQUIRED)
 find_package(LIBXSLT REQUIRED)
+set(WINSOCK "")
+endif()
+
 
 include_directories(
 ${LIBXML2_INCLUDE_DIR}
@@ -29,6 +40,7 @@ target_link_libraries(example1
 	${LIBXSLT_LIBRARIES}
 	$<TARGET_LINKER_FILE:ltklib>
 	$<TARGET_LINKER_FILE:llrplib>
+	${WINSOCK}
 )
 
 install(TARGETS example1
