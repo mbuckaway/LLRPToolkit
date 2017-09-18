@@ -13,6 +13,11 @@ Linux, and will require some changes for Windows.
 The cmakefiles assume LIBXML2 and LIBXLST are installed on the platform for MacOSX and Linux.
 
 To build, do the following:
+On Mac/Linux, run "bash build.sh"
+
+On Windows, run build.cmd.
+
+To build it manually, run:
 1) mkdir build
 2) cd build
 3) cmake ..
